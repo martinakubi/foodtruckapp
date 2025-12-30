@@ -1,0 +1,81 @@
+@page "/admin/charts"
+@model FoodTruckApp.Areas.Admin.Pages.ChartsModel
+@{
+    ViewData["Title"] = "Charts";
+}
+<h1>Charts</h1>
+<br />
+@if(!Model.MonthlyRevenuesView.Any()) 
+{
+    <p>No data to upload.</p>
+    return;
+}
+@if(Model.MonthlyRevenuesView != null && Model.MonthlyRevenuesView.Any()) 
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Revenue + VAT</th>
+                <th>Revenue + VAT by CARD</th>
+                <th>Revenue - VAT</th>
+                <th>VAT 11 %</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var month in Model.MonthlyRevenuesView)
+            {
+                <tr>
+                    <td>            
+                        <form method="post">
+                            <input type="hidden" name="month" value="@month.Month" />
+                            <button type="submit" class="btn btn-outline-primary">@month.MonthName</button>
+                        </form>
+                    </td>
+                    <td>@month.TotalRevenue.ToString("# ### ##0") ISK</td>
+                    <td>@month.TotalRevenueCard.ToString("# ### ##0") ISK</td>
+                    <td>@month.TotalRevenueNoVat.ToString("# ### ##0") ISK </td>
+                    <td>@month.TotalVAT.ToString("# ### ##0") ISK</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if(Model.DailyRevenuesView != null && Model.DailyRevenuesView.Any())
+{
+    <table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Revenue + VAT</th>
+            <th>Revenue + VAT by CARD</th>
+            <th>Revenue - VAT</th>
+            <th>VAT 11 %</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var day in Model.DailyRevenuesView)
+        {
+            <tr>
+                <td>@day.Day</td>
+                <td>@day.TotalRevenue.ToString("# ### ##0") ISK</td>
+                <td>@day.TotalRevenueCard.ToString("# ### ##0") ISK</td>
+                <td>@day.TotalRevenueNoVat.ToString("# ### ##0") ISK</td>
+                <td>@day.TotalVAT.ToString("# ### ##0") ISK</td>
+            </tr>
+        }
+    </tbody>
+</table>
+}
+
+<script src="~/js/chart.js"></script>
+<script>
+    const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Labels));
+    const values = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Values));
+</script>
+<script src="~/js/funcchart.js"></script>
+
+<div class="chart-view">
+  <canvas id="revenueChart" width="600" height="300"></canvas>
+</div>

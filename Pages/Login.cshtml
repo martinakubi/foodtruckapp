@@ -1,0 +1,30 @@
+@page "/login"
+@using FoodTruckApp.Pages
+@model LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+<h1>Login</h1>
+<br />
+<form method="post">
+    <div class="form-floating mb-3">
+        <input asp-for="Username" class="form-control" placeholder="." />
+        <label asp-for="Username"></label>
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Password" type="password" class="form-control" placeholder="." />
+        <label asp-for="Password"></label>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-danger mb-3">Login</button>
+</form>
+
+@if(Model.LoginFailed == true)
+{
+    <div class="alert alert-danger">Invalid login credentials.</div>
+}
+
+

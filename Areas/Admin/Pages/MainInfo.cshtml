@@ -1,0 +1,100 @@
+@page "/admin/maininfo"
+@model FoodTruckApp.Areas.Admin.Pages.MainInfoModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<p>Openning hours:</p>
+
+<form method="post" asp-page-handler="ChangeHours">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input type="hidden" asp-for="OpenStatus.Id" />
+    <input type="hidden" asp-for="OpenHours.Id" />
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" asp-for="OpenStatus.IsOpen" />
+        <label class="form-check-label">Open today</label>
+    </div>
+
+    <div>
+        <div class="form-floating mb-3">
+            <input asp-for="OpenHours.Openhour" class="form-control" type="time" placeholder="Open hour" />
+            <label asp-for="OpenHours.Openhour">Open Hour</label>
+            <span asp-validation-for="OpenHours.Openhour" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="OpenHours.Closehour" class="form-control" type="time" placeholder="Close hour" />
+            <label asp-for="OpenHours.Closehour">Close Hour</label>
+            <span asp-validation-for="OpenHours.Closehour" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save openning hours</button>
+</form>
+
+<br />
+
+<p>Merchant credentials: </p>
+<form method="post" asp-page-handler="ChangeMerchantDetails">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.Name" class="form-control" placeholder="." />
+        <label asp-for="Merchant.Name" class="form-label"></label>
+        <span asp-validation-for="Merchant.Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.Address" class="form-control" placeholder="." />
+        <label asp-for="Merchant.Address" class="form-label"></label>
+        <span asp-validation-for="Merchant.Address" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.PhoneNumber" class="form-control" placeholder="." />
+        <label asp-for="Merchant.PhoneNumber" class="form-label"></label>
+        <span asp-validation-for="Merchant.PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.EmailAddress" class="form-control" placeholder="." />
+        <label asp-for="Merchant.EmailAddress" class="form-label"></label>
+        <span asp-validation-for="Merchant.EmailAddress" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.Kennitala" class="form-control" placeholder="." />
+        <label asp-for="Merchant.Kennitala" class="form-label"></label>
+        <span asp-validation-for="Merchant.Kennitala" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.VSKNumber" class="form-control" placeholder="." />
+        <label asp-for="Merchant.VSKNumber" class="form-label"></label>
+        <span asp-validation-for="Merchant.VSKNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.MapEmbed" class="form-control" placeholder="." />
+        <label asp-for="Merchant.MapEmbed" class="form-label"></label>
+        <span asp-validation-for="Merchant.MapEmbed" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.TripAdviEmbed" class="form-control" placeholder="." />
+        <label asp-for="Merchant.TripAdviEmbed" class="form-label"></label>
+        <span asp-validation-for="Merchant.TripAdviEmbed" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Merchant.GoogleEmbed" class="form-control" placeholder="." />
+        <label asp-for="Merchant.GoogleEmbed" class="form-label"></label>
+        <span asp-validation-for="Merchant.GoogleEmbed" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">@(Model.Merchant == null ? "Save merchant credentials" : "Change merchant credentials")</button>
+</form>
+
+

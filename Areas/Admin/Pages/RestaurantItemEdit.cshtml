@@ -1,0 +1,72 @@
+@page "/admin/menu/{ItemId:int}"
+@model FoodTruckApp.Areas.Admin.Pages.RestaurantItemEditModel
+@{
+    ViewData["Title"] = (Model.ItemId == 0 ? "Add" : "Edit");
+}
+
+@if (Model.ResItem == null)
+{
+    <h1>Item not found.</h1>
+    return;
+}
+
+<p class="display-4">@(Model.ItemId == 0 ? "Add a new item" : $"Edit {Model.ResItem.Name} n. {Model.ResItem.Id}")</p>
+<form method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="ResItem.Id" id="ItemId"/>
+
+    <div class="form-floating mb-3">
+        <input asp-for="ResItem.Name" class="form-control" placeholder="." />
+        <label asp-for="ResItem.Name" class="form-label"></label>
+        <span asp-validation-for="ResItem.Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="ResItem.Price" class="form-control" placeholder="." />
+        <label asp-for="ResItem.Price" class="form-label"></label>
+        <span asp-validation-for="ResItem.Price" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <input asp-for="ImageUpload" type="file" class="form-control" placeholder="." />       
+        <span id="fileName">@Model.ResItem.ImagePath</span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <textarea asp-for="ResItem.Description" class="form-control" placeholder="." 
+        style="height: 6rem;"></textarea>
+        <label asp-for="ResItem.Description" class="form-label"></label>
+        <span asp-validation-for="ResItem.Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <select asp-for="ResItem.MealType" asp-items="Model.MealTypeOptions" class="form-select">
+            <option value="">-- Select meal type --</option>
+        </select>
+        <label asp-for="ResItem.MealType" class="form-label"></label>
+        <span asp-validation-for="ResItem.MealType" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <select asp-for="ResItem.Ability" class="form-select">
+            <option value="">-- Select ability --</option>
+            <option value="1">Able</option>
+            <option value="0">Disable</option>
+        </select>
+        <label asp-for="ResItem.Ability">Ability</label>
+        <span asp-validation-for="ResItem.Ability" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex gap-3 flex-row">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="@(Model.ItemId == 0 ? "/Index" : $"/menu/{Model.ResItem.Kod}")" 
+        class="btn btn-warning">Cancel</a>
+    </div>
+</form>
+<br>
+@if(Model.ItemId > 0){
+    <form method="post" asp-page-handler="delete" id="itemId_del">
+        <input type="hidden" value="@Model.ResItem.Id" name="ItemIdDel" />
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+}

@@ -1,0 +1,31 @@
+﻿@page "/menu/{Kod}"
+@using FoodTruckApp.Pages
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@model RestaurantItemModel
+@{
+    ViewData["Title"] = Model?.RestaurantItem?.Name;
+}
+
+@if (Model.RestaurantItem == null)
+{
+    <h1>Item not found.</h1>
+    return;
+}
+
+<h1 class="display-4">@Model.RestaurantItem.Name</h1>
+<p class="lead">Price: @(Model.RestaurantItem.Price.ToString("# ##0")) ISK</p>
+<p class="lead">Description: @Model.RestaurantItem.Description</p>
+<p>
+    <img class="img-fluid mx-auto d-block" src="@Url.Content(Model.RestaurantItem.ImagePath)" alt="@Model.RestaurantItem.Name" />
+</p>
+
+<p class=" mt-3">
+    <a href="/Index" class="btn btn-outline-primary">Back to menu</a>
+    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+    {
+        <a href="/admin/menu/@(Model.RestaurantItem.Id)" class="btn btn-outline-primary">Edit</a>
+    }
+</p>
+
+

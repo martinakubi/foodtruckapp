@@ -1,0 +1,72 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<p class="fs-1 text-center">Welcome in @Model.Merchant?.Name foodtruck</p>
+<br>
+@if (Model.IsOpen == true)
+{
+    <p class="fs-1 text-success text-center">Today openning hours: @(Model.Openhours) - @(Model.Closehours)</p>
+}
+else
+{
+    <p class="fs-1 text-danger text-center">Today closed</p> 
+}
+<br>
+
+<div class="container">
+    <div class="row text-center">
+        @foreach (var item in Model.RestaurantItems)
+        {
+            <div class="col-sm-4 mb-4">
+                @if (!string.IsNullOrEmpty(item.ImagePath))
+                {
+                    <a href="/menu/@item.Kod"><img class="img-fluid align-content-center" src="@Url.Content(item.ImagePath)" alt="@item.Name" /></a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div class="text-center"><a href="/main" class="btn btn-lg btn-outline-primary">See our all menu <i class="bi bi-hand-index"></i></a></div>
+
+<br>
+
+<div>
+    <p class="text-center">We would be grateful for Your feedback in the form of a review on one of the following sites:</p>
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-6">
+                <a href="@Model.Merchant?.TripAdviEmbed" target="_blank">
+                    <img src="~/pictures/shared/tripadvisor.png" alt="TripAdvisor" class="img-fluid" style="max-width: 80px;" />
+                </a>
+            </div>
+            <div class="col-6">
+                <a href="@Model.Merchant?.GoogleEmbed" target="_blank">
+                    <img src="~/pictures/shared/googlemaps.png" alt="Google Maps" class="img-fluid" style="max-width: 80px;" />
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<h2><i class="bi bi-info-circle"></i> Contact</h2>
+
+<div>
+    <p>@Model.Merchant?.Name</p>
+    <p><i class="bi bi-pin-map"></i> @Model.Merchant?.Address</p>
+    <p><i class="bi bi-send"></i>  <a href="mailto:@Model.Merchant?.EmailAddress">@Model.Merchant?.EmailAddress</a></p>
+    <p><i class="bi bi-telephone"></i> <a href="tel:@Model.Merchant?.PhoneNumber">@Model.Merchant?.PhoneNumber</a></p>
+    <iframe src="@Model.Merchant?.MapEmbed" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" 
+            width="600"
+            height="450"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy">
+    </iframe>      
+</div>
+

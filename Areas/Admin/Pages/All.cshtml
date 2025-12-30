@@ -1,0 +1,42 @@
+@page "/admin/all"
+@model FoodTruckApp.Areas.Admin.Pages.AllModel
+@{
+    ViewData["Title"] = "All Orders";
+}
+
+<h1>All Orders</h1>
+<br />
+@if(!Model.NewOrder.Any())
+{
+    <p>You have no orders.</p>
+    return;
+}
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Order number</th>
+            <th>Date</th>
+            <th class="text-end pe-5">Items</th>
+            <th class="text-end pe-5">Price</th>
+            <th>User</th>
+            <th>State</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var ob in Model.NewOrder) 
+        {
+           <tr>
+                <td>
+                    <a asp-area="Admin" asp-page="/OrderDetail" asp-route-OrderId="@ob.Id">
+                    @ob.Id.ToString()
+                    </a>
+                </td>
+                <td>@ob.Date.ToString("yyyy-MM-dd HH:mm")</td>
+                <td class="text-end pe-5">@ob.Items.Sum(p => p.NumOfDishes)</td>
+                <td class="text-end pe-5">@ob.Items.Sum(p => p.PricePerOne * p.NumOfDishes).ToString("# ##0")</td>
+                <td>@(ob.UserName?.Length > 10 ? ob.UserName.Substring(0, 10) + "…" : ob.UserName)</td>
+                <td>@ob.State</td>
+            </tr>
+        }
+    </tbody>
+</table>

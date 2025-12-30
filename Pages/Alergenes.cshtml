@@ -1,0 +1,21 @@
+@page "/alergenes"
+@model AlergenesModel
+@{
+    ViewData["Title"] = "Alergenes";
+}
+
+<h1>Alergenes list</h1>
+<br />
+@if(Model.AlergenesTypeList == null)
+{
+    <p>Alergenes are missing.</p>
+    return;
+}
+
+@foreach (var item in Model.AlergenesTypeList) {
+    <div>
+        <h3>@item.AlergenNum.ToString()</h3>
+        <p>@item.AlergenDescription</p>
+    </div>
+}
+

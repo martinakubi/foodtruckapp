@@ -1,0 +1,305 @@
+@page "/admin/cashsys"
+@model FoodTruckApp.Areas.Admin.Pages.CashSysModel
+@{
+    ViewData["Title"] = "Cash system";
+}
+
+<style>
+.custom-page .btn-secondary {
+    border-color: black;
+    background-color: white;
+    font-size: 10px;
+    color: black;
+    text-align: center;
+    vertical-align: middle;
+    }
+
+.custom-page .btn-sm {
+    font-size: 10px;
+}
+</style>
+
+<div class="container custom-page">
+    <div class="row">
+
+        <div class="col-7">
+            <p>Main</p>
+                <div class="row g-2 mb-3">
+                    @foreach (var item in Model.RestaurantItems.Where(x => x.MealType == Models.MealType.Main))
+                    {
+                        <div class="col-4">
+                            <form method="post">
+                                <input type="hidden" name="itemId" value="@item.Id" />
+                                <input type="hidden" name="operation" value="+" />
+                                    <button type="submit" class="btn btn-secondary w-100">@item.Name</button>
+                    
+                            </form>
+                        </div>
+                            
+                    }
+                </div>
+            <p>Soup</p>
+                <div class="row g-2 mb-3">
+                    @foreach (var item in Model.RestaurantItems.Where(x => x.MealType == Models.MealType.Soup))
+                    {
+                        <div class="col-4">
+                            <form method="post">
+                                <input type="hidden" name="itemId" value="@item.Id" />
+                                <input type="hidden" name="operation" value="+" />
+                                    <button type="submit" class="btn btn-secondary w-100">@item.Name</button>
+                    
+                            </form>
+                        </div>
+                            
+                    }
+                </div>
+            <p>Drink</p>
+                <div class="row g-2 mb-3">
+                @foreach (var item in Model.RestaurantItems.Where(x => x.MealType == Models.MealType.Drink))
+                {
+                    <div class="col-4">
+                        <form method="post">
+                            <input type="hidden" name="itemId" value="@item.Id" />
+                            <input type="hidden" name="operation" value="+" />
+                            <button type="submit" class="btn btn-secondary w-100">@item.Name</button>
+                    
+                        </form>
+                    </div>
+                            
+                }
+                </div>
+            <p>Sauce</p>
+                <div class="row g-2 mb-3">
+                    @foreach (var item in Model.RestaurantItems.Where(x => x.MealType == Models.MealType.Sauce))
+                    {
+                        <div class="col-4">
+                            <form method="post">
+                                <input type="hidden" name="itemId" value="@item.Id" />
+                                <input type="hidden" name="operation" value="+" />
+                                <button type="submit" class="btn btn-secondary w-100">@item.Name</button>
+                    
+                            </form>
+                        </div>
+                            
+                    }
+                </div>
+            
+        </div>
+
+        <div class="col-5">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Dish</th>
+                        <th>Price</th>
+                        <th></th>
+                        <th>Por</th>
+                        <th>Del</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in Model.NewOrderItems) 
+                    {
+                        <form method="post">
+                            <input type="hidden" name="itemId" value="@item.RestaurantItemId" />
+                            <input type="hidden" name="guild" value="@item.Id" />
+                            <tr>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm" 
+                                        data-bs-toggle="modal" data-bs-target="#priceModal_@item.RestaurantItemId">
+                                        @item.Name
+                                    </button>
+                                </td>
+                                <td>@item.PricePerOne.ToString("# ##0")</td>
+                                <td>
+                                    <button type="submit" class="btn btn-primary btn-sm" name="operation" value="-">
+                                        -
+                                    </button>
+                                    <button type="submit" class="btn btn-danger btn-sm" name="operation" value="+">
+                                        +
+                                    </button>
+                                    
+                                </td>
+                                <td>@item.NumOfPortions</td>
+                                <td>
+                                    <button type="submit" class="btn btn-dark btn-sm" name="operation" value="x">
+                                        x
+                                    </button>
+                                </td>
+                            </tr>
+                        </form>
+                        <div class="modal fade" id="priceModal_@item.RestaurantItemId" tabindex="-1" aria-labelledby="priceModalLabel_@item.RestaurantItemId" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form method="post">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Změnit cenu - @item.Name</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" name="itemId" value="@item.RestaurantItemId" />
+                                            <input type="hidden" name="operation" value="c" />
+                                            <div class="mb-3">
+                                                <label class="form-label">New price</label>
+                                                <input type="number" step="1" class="form-control" name="newPrice" value="@item.PricePerOne" required />
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-success">Save change</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>                    
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-end fw-bold">
+                            Total: @Model.NewOrderItems.Sum(item => item.PricePerOne * item.NumOfPortions).ToString("# ##0") ISK
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            <form method="post" asp-page-handler="order" id="orderForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="UserName" value="@Model.GeneratedUserName" />
+                <input type="hidden" id="PaymentType" name="PaymentType" value="" />
+
+                <div class="form-floating mb-3">
+                    <input asp-for="kennitala" class="form-control" placeholder="." />
+                    <label class="form-label">Kennitala</label>
+                    <span asp-validation-for="kennitala" class="text-danger"></span>
+                </div>
+                <div class="d-flex gap-1 mt-3">
+                    <button id="placeOrderBtn" type="button" onclick="printReceiptandSubmit(this, 2)" class="btn btn-success">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <span class="btn-text">Card <i class="bi bi-credit-card"></i></span>
+                    </button>
+
+                    <button id="placeOrderBtn" type="button" onclick="printReceiptandSubmit(this, 1)" class="btn btn-success">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <span class="btn-text">Cash <i class="bi bi-cash-coin"></i></span>
+                    </button>
+                    <button type="submit" name="operation" value="delete" class="btn btn-outline-danger">Del</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@{
+    var jsonOrderItems = System.Text.Json.JsonSerializer.Serialize(Model.NewOrderItems);
+}
+
+<script>
+    const orderItems = @Html.Raw(jsonOrderItems);
+</script>
+
+<script src="/js/epos-2.27.0.js"></script>
+<script src="/js/site.js"></script>
+
+<script>
+    window.printReceiptandSubmit = function (btn, paymentvalue) {
+
+    const spinner = btn.querySelector(".spinner-border");
+    const btnText = btn.querySelector(".btn-text");
+
+    document.getElementById("PaymentType").value = paymentvalue;
+
+    spinner.classList.remove("d-none");
+    btnText.textContent = "Saving & Printing...";
+    btn.disabled = true;
+
+    const form = document.getElementById("orderForm");
+    const formData = new FormData(form);
+    let formSubmitted = false;
+
+    const submitForm = () => {
+        if (!formSubmitted) {
+            formSubmitted = true;
+            window.location.reload();
+        }
+    };
+
+const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+fetch("/admin/cashsys?handler=orderJson", {
+    method: "POST",
+    headers: {
+    "X-CSRF-TOKEN": token
+},
+    body: formData
+})
+    .then(resp => resp.json())
+    .then(data => {
+        if (!data.success) {
+            alert("❌ Chyba při ukládání objednávky.");
+            submitForm();
+            return;
+        }
+
+        const orderId = data.orderId;
+        const orderDate = new Date(data.orderDate).toLocaleString();
+        const ordercashsysnum = data.userName;
+        const numberOnly = ordercashsysnum.replace("cashsys", "");
+        const kennitala1 = data.ordkenni;
+        const device = new epson.ePOSDevice();
+        const merchantName = data.merchantname;
+        const merchantAddress = data.merchantadress;
+        const merchantPhone = data.merchantphone;
+        const merchantEmail = data.merchantemail;
+        const merchantKennitala = data.merchantkennitala;
+        const merchantVsk = data.merchantvsk;
+
+        device.connect("192.168.8.103", true, function (connectResult) {
+            if (connectResult === 'SSL_CONNECT_OK') {
+                device.createDevice("local_printer", device.DEVICE_TYPE_PRINTER, { crypto: true, buffer: false }, function (printer, code) {
+                    if (code === 'OK') 
+                    {
+                        printer.onreceive = function (res) 
+                        {
+                            if (res.success) 
+                            {
+                               // alert("✅ Tisk byl úspěšný.");
+                            } 
+                            else 
+                            {
+                                alert("❌ Chyba při tisku.");
+                            }
+                            submitForm();
+                        };
+                        generateReceiptText(printer, orderItems, orderId, orderDate, numberOnly, kennitala1, merchantAddress, merchantPhone, merchantEmail, merchantKennitala, merchantVsk)
+                        printer.send();
+                    } 
+                    else 
+                    {
+                        alert("❌ Nelze vytvořit zařízení: " + code);
+                        submitForm();
+                    }
+                });
+            } 
+            else 
+            {
+                alert("❌ Nelze se připojit k tiskárně: " + connectResult);
+                submitForm();
+            }
+        });
+    })
+    .catch(err => {
+        alert("⚠️ Neočekávaná chyba: " + err);
+        submitForm();
+    });
+
+    // fallback timeout
+    setTimeout(() => {
+        if (!formSubmitted) {
+            alert("⚠️ Timeout – odesílám dál.");
+            submitForm();
+        }
+    }, 10000);
+}
+
+</script>

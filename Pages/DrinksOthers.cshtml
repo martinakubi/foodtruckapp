@@ -1,0 +1,66 @@
+@page "/drinksothers"
+@model DrinksOthersModel
+@{
+    ViewData["Title"] = "Drinks & others";
+}
+
+<h1>Drinks and others</h1>
+<br>
+@if(Model.RestaurantItems == null)
+{
+    <p>We are currently preparing a new menu, please check our website later.</p>
+    return;
+}
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model.RestaurantItems.Where(x => x.MealType == Models.MealType.Drink))
+        {
+            <div class="col-6 col-md-4 col-lg-2 mb-4 text-center">
+                <a href="/menu/@item.Kod" class="text-decoration-none text-dark">
+                @if(item.ImagePath.Length > 1){
+                    <img src="@item.ImagePath" alt="@item.Name"
+                         class="img-fluid mb-2" style="max-height: 150px;" />
+                         }
+                    <h5>@item.Name</h5>
+                    <p>@item.Price.ToString("# ##0") ISK</p>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model.RestaurantItems.Where(x => x.MealType == Models.MealType.Desert))
+        {
+            <div class="col-6 col-md-4 col-lg-2 mb-4 text-center">
+                <a href="/menu/@item.Kod" class="text-decoration-none text-dark">
+                @if(item.ImagePath.Length > 1){
+                    <img src="@item.ImagePath" alt="@item.Name"
+                            class="img-fluid mb-2" style="max-height: 150px;" />
+                            }
+                    <h5>@item.Name</h5>
+                    <p>@item.Price.ToString("# ##0") ISK</p>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model.RestaurantItems.Where(x => x.MealType == Models.MealType.Sauce))
+        {
+            <div class="col-6 col-md-4 col-lg-2 mb-4 text-center">
+                <a href="/menu/@item.Kod" class="text-decoration-none text-dark">
+                @if(item.ImagePath.Length > 1){
+                    <img src="@item.ImagePath" alt="@item.Name"
+                         class="img-fluid mb-2" style="max-height: 150px;" />
+                         }
+                    <h5>@item.Name</h5>
+                    <p>@item.Price.ToString("# ##0") ISK</p>
+                </a>
+            </div>
+        }
+    </div>
+</div>

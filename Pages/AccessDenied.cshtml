@@ -1,0 +1,9 @@
+@page "/AccessDenied"
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="alert alert-danger">Sorry, access denied.</div>

@@ -1,0 +1,193 @@
+@page "/admin/all/{OrderId:int}"
+@model FoodTruckApp.Areas.Admin.Pages.OrderDetailModel
+@{
+    ViewData["Title"] = "All Orders";
+}
+
+<p>Order number: @(Model.NewOrder.Id.ToString())</p>
+<br>
+<p>Date: @(Model.NewOrder.Date.ToString("yyyy-MM-dd HH:mm"))</p>
+<br>
+<p>Customer: @(Model.NewOrder.UserName.ToString())</p>
+<br>
+<p>State: @(FoodTruckApp.Code.StatusOrder.Status(Model.NewOrder.State))</p>
+<br>
+<p>Payment Method: @(FoodTruckApp.Code.PayMethod.Status(Model.NewOrder.PaymentMethod.GetValueOrDefault()))</p>
+<br>
+@if(Model.Kennitala != null)
+{
+    <p>Kennitala: @(Model.Kennitala != null ? Model.Kennitala.KennitalaNumber : "Untiped")</p>
+    <br>
+}
+<br>
+<table class="table">
+    <thead>
+        <tr>
+            <th class="pe-5">Items</th>
+            <th class="pe-5">Portions</th>
+            <th class="pe-5">Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ob in Model.NewOrder.Items)
+        {
+            <tr>
+                <td class="pe-5">@ob.RestaurantItem.Name</td>
+                <td class="pe-5">@ob.NumOfDishes x</td>
+                <td class="pe-5">@((ob.PricePerOne * ob.NumOfDishes).ToString("# ##0")) ISK</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+            <tr>
+                <th class="pe-5"></th>
+                <th class="pe-5"></th>
+                <th class="pe-5">Total: @(Model.NewOrder.Items.Sum(ob => ob.PricePerOne * ob.NumOfDishes).ToString("# ##0")) ISK</th>
+            </tr>
+    </tfoot>
+</table>
+
+<form id="orderForm" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="OrderId" value="@Model.OrderId" />
+    <button type="button" class="btn btn-primary" onclick="printReceiptandSubmit()">
+        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        <span class="btn-text">Print order <i class="bi bi-printer"></i></span>
+    </button>
+
+</form>
+
+<br>
+
+<form method="post" asp-page-handler="state">
+
+    <input type="hidden" name="OrderId" value="@Model.OrderId" />
+
+    <div class="form-floating mb-3">
+        <select asp-for="NewOrder.PaymentMethod" asp-items="FoodTruckApp.Code.PayMethod.PaymentMethodList" class="form-select">
+            <option value="">-- Select order status --</option>
+        </select>
+        <label asp-for="NewOrder.PaymentMethod" class="form-label"></label>
+        <span asp-validation-for="NewOrder.PaymentMethod" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
+        <select asp-for="NewOrder.State" asp-items="FoodTruckApp.Code.StatusOrder.StatusList" class="form-select">
+            <option value="">-- Select order status --</option>
+        </select>
+        <label asp-for="NewOrder.State" class="form-label"></label>
+        <span asp-validation-for="NewOrder.State" class="text-danger"></span>
+    </div>
+
+    @if(Model.NewOrder.State == 4 || !string.IsNullOrEmpty(Model.NewOrder.StornoNote))   
+    {
+        <div class="form-floating mb-3">
+            <textarea asp-for="NewOrder.StornoNote" class="form-control" placeholder="." 
+            style="height: 6rem;"></textarea>
+            <label asp-for="NewOrder.StornoNote" class="form-label"></label>
+            <span asp-validation-for="NewOrder.StornoNote" class="text-danger"></span>
+        </div>
+    }
+
+    <div class="d-flex gap-3 flex-row">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>
+
+@{
+    var jsonOrderItems = System.Text.Json.JsonSerializer.Serialize(
+        Model.NewOrder.Items.Select(i => new {
+            Name = i.RestaurantItem.Name,
+            NumOfPortions = i.NumOfDishes,
+            PricePerOne = i.PricePerOne
+        })
+    );
+}
+
+
+<script>
+    const orderItems = @Html.Raw(jsonOrderItems);
+</script>
+
+<script src="/js/epos-2.27.0.js"></script>
+
+<script>
+    window.printReceiptandSubmit = function () {
+
+    const spinner = document.querySelector(".spinner-border");
+    const btnText = document.querySelector(".btn-text");
+
+    spinner.classList.remove("d-none");
+    btnText.textContent = "Printing...";
+    document.disabled = true;
+
+    const form = document.getElementById("orderForm");
+    const formData = new FormData(form);
+    let formSubmitted = false;
+
+    const submitForm = () => {
+        if (!formSubmitted) {
+            formSubmitted = true;
+            window.location.reload();
+        }
+    };
+
+const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+    fetch(`/admin/all/${@Model.OrderId}?handler=Print`, 
+    {
+        method: "POST",
+        headers: { "X-CSRF-TOKEN": token },
+        body: formData
+    })
+    .then(resp => 
+    {
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        return resp.json();
+    })
+    .then(data => 
+    {
+        const orderId = data.orderId;
+        const orderDate = new Date(data.orderDate).toLocaleString();
+        const ordercashsysnum = data.userName;
+        const numberOnly = ordercashsysnum.replace("cashsys", "");
+        const kennitala1 = data.ordkenni;
+        const device = new epson.ePOSDevice();
+        
+        device.connect("192.168.8.103", true, function (connectResult) {
+            if (connectResult === 'SSL_CONNECT_OK') {
+                device.createDevice("local_printer", device.DEVICE_TYPE_PRINTER, { crypto: true, buffer: false }, function (printer, code) {
+                    if (code === 'OK') {
+                        printer.onreceive = function (res) {
+                            if (res.success) {
+                                alert("✅ Tisk byl úspěšný.");
+                            } else {
+                                alert("❌ Chyba při tisku.");
+                            }
+                            submitForm();
+                        };
+
+                        generateReceiptText(printer, orderItems, orderId, orderDate, numberOnly, kennitala1)
+                        printer.send();
+
+                    } else {
+                        alert("❌ Nelze vytvořit zařízení: " + code);
+                        submitForm();
+                    }
+                });
+            } else {
+                alert("❌ Nelze se připojit k tiskárně: " + connectResult);
+                submitForm();
+            }
+        });
+    })
+    .catch(err => {
+        alert("⚠️ Neočekávaná chyba: " + err);
+        submitForm();
+    });
+}
+</script>
+
+
+
